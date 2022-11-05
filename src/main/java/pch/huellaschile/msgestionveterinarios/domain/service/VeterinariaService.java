@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pch.huellaschile.msgestionveterinarios.common.exception.VeterinariaExistException;
+import pch.huellaschile.msgestionveterinarios.common.exception.VeterinarioNotExistException;
 import pch.huellaschile.msgestionveterinarios.domain.model.dto.RequestVeterinariaDTO;
 import pch.huellaschile.msgestionveterinarios.domain.model.entity.Veterinaria;
 import pch.huellaschile.msgestionveterinarios.domain.model.entity.Veterinario;
@@ -29,12 +31,13 @@ public class VeterinariaService {
         return repository.findByRegistroNacionalIgnoreCase(registro);
     }
 
-    public Veterinaria createVeterinaria(Veterinaria vet) {
+    public Veterinaria createVeterinaria(Veterinaria vet) throws VeterinarioNotExistException, VeterinariaExistException {
 
         Veterinario veterinario = repositoryVet.findByLicenciaProfesional(vet.getLicenciaProfesional());
+        Object[] args = {vet};
 
         if(veterinario == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Veterinario no existe");
+            throw new VeterinarioNotExistException("veterinario.notexist.message", args);
         }
 
         vet.setVeterinario(veterinario);
@@ -42,7 +45,7 @@ public class VeterinariaService {
         boolean exist = repository.existsVeterinarioByRegistroNacionalIgnoreCase(vet.getRegistroNacional());
 
         if(exist) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Veterinaria ya existe");
+            throw new VeterinariaExistException("veterinaria.exist.message", args);
         }
 
         return repository.save(vet);

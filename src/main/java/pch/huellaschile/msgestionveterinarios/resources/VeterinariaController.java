@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pch.huellaschile.msgestionveterinarios.common.exception.VeterinariaExistException;
+import pch.huellaschile.msgestionveterinarios.common.exception.VeterinarioNotExistException;
 import pch.huellaschile.msgestionveterinarios.domain.model.dto.RequestVeterinariaDTO;
 import pch.huellaschile.msgestionveterinarios.domain.model.entity.Veterinaria;
 import pch.huellaschile.msgestionveterinarios.domain.service.VeterinariaService;
@@ -18,7 +20,7 @@ public class VeterinariaController {
     private VeterinariaService service;
 
     @PostMapping("/")
-    public ResponseEntity<Veterinaria> agregarConsulta(@RequestBody Veterinaria veterinaria) {
+    public ResponseEntity<Veterinaria> agregarConsulta(@RequestBody Veterinaria veterinaria) throws VeterinariaExistException, VeterinarioNotExistException {
         Veterinaria vet = service.createVeterinaria(veterinaria);
         return new ResponseEntity<>(vet, HttpStatus.OK);
     }
